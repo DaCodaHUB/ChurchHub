@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "generatedAt": "2026-01-12T00:00:00Z",
+  "announcements": [
+    {
+      "id": "ann_welcome",
+      "title": "Welcome!",
+      "bodyMarkdown": "Thanks for joining us this week.",
+      "category": "General",
+      "pinned": true,
+      "publishedAt": "2026-01-12T18:00:00Z",
+      "updatedAt": "2026-01-12T18:00:00Z"
+    }
+  ]
+}

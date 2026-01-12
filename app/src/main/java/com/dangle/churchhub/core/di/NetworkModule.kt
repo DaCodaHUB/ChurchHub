@@ -1,5 +1,6 @@
 package com.dangle.churchhub.core.di
 
+import com.dangle.churchhub.data.remote.api.AnnouncementsApi
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
 import dagger.Provides
@@ -15,7 +16,8 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object NetworkModule {
 
-    private const val BASE_URL = "https://raw.githubusercontent.com/<USER>/<REPO>/<BRANCH>/"
+    // TODO: Replace with your real repo path
+    private const val BASE_URL = "https://raw.githubusercontent.com/DaCodaHUB/ChurchHub/main/"
 
     @Provides @Singleton
     fun provideJson(): Json = Json {
@@ -35,4 +37,8 @@ object NetworkModule {
             .addConverterFactory(json.asConverterFactory(contentType))
             .build()
     }
+
+    @Provides @Singleton
+    fun provideAnnouncementsApi(retrofit: Retrofit): AnnouncementsApi =
+        retrofit.create(AnnouncementsApi::class.java)
 }
