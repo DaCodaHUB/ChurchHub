@@ -8,6 +8,9 @@ import com.dangle.churchhub.ui.announcements.AnnouncementsScreen
 import com.dangle.churchhub.ui.home.HomeScreen
 import com.dangle.churchhub.ui.more.MoreScreen
 import com.dangle.churchhub.ui.sermons.SermonsScreen
+import androidx.navigation.NavType
+import androidx.navigation.navArgument
+import com.dangle.churchhub.ui.sermons.detail.SermonDetailScreen
 
 @Composable
 fun AppNav() {
@@ -19,7 +22,21 @@ fun AppNav() {
     ) {
         composable(Route.Home.path) { HomeScreen() }
         composable(Route.Announcements.path) { AnnouncementsScreen() }
-        composable(Route.Sermons.path) { SermonsScreen() }
+        composable(Route.Sermons.path) {
+            SermonsScreen(onSermonClick = { id ->
+                navController.navigate(Route.SermonDetail.create(id))
+            })
+        }
         composable(Route.More.path) { MoreScreen() }
+        composable(
+            route = Route.SermonDetail.path,
+            arguments = listOf(navArgument("sermonId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val sermonId = backStackEntry.arguments?.getString("sermonId")!!
+            SermonDetailScreen(
+                sermonId = sermonId,
+                onBack = { navController.popBackStack() }
+            )
+        }
     }
 }

@@ -5,4 +5,8 @@ sealed class Route(val path: String) {
     data object Announcements : Route("announcements")
     data object Sermons : Route("sermons")
     data object More : Route("more")
+
+    data object SermonDetail : Route("sermons/{sermonId}") {
+        fun create(sermonId: String) = "sermons/$sermonId"
+    }
 }

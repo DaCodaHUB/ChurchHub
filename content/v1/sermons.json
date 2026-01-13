@@ -1,0 +1,28 @@
+{
+  "version": 1,
+  "generatedAt": "2026-01-12T00:00:00Z",
+  "sermons": [
+    {
+      "id": "sermon_2026_01_05",
+      "title": "A Community of Jesus Followers",
+      "speaker": "Pastor Nathan",
+      "series": "Vision",
+      "date": "2026-01-05T18:00:00Z",
+      "audioUrl": "https://example.com/audio/sermon_2026_01_05.mp3",
+      "durationSec": 2420,
+      "notesMarkdown": "Key passages: John 13, Acts 2…",
+      "updatedAt": "2026-01-06T01:00:00Z"
+    },
+    {
+      "id": "sermon_2025_12_29",
+      "title": "Hope in Christ",
+      "speaker": "Pastor Nathan",
+      "series": "Advent",
+      "date": "2025-12-29T18:00:00Z",
+      "audioUrl": "https://example.com/audio/sermon_2025_12_29.mp3",
+      "durationSec": 2150,
+      "notesMarkdown": null,
+      "updatedAt": "2025-12-30T01:00:00Z"
+    }
+  ]
+}
