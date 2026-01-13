@@ -1,69 +1,55 @@
 package com.dangle.churchhub.ui.sermons
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
+import com.dangle.churchhub.core.util.openYouTubeVideo
 
 @Composable
 fun SermonsScreen(
-    onSermonClick: (String) -> Unit,
     vm: SermonsViewModel = hiltViewModel()
 ) {
-    val state by vm.uiState.collectAsState()
+    val context = LocalContext.current
+    val sermons = vm.sermons.collectAsState().value
 
-    Column(Modifier.fillMaxSize()) {
+    LaunchedEffect(Unit) { vm.refresh() }
 
-        if (state.error != null) {
-            Text(
-                text = "Sync failed: ${state.error}",
-                modifier = Modifier.padding(16.dp),
-                color = MaterialTheme.colorScheme.error
-            )
+    Column(Modifier.fillMaxSize().padding(16.dp)) {
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            Text("Sermons", style = MaterialTheme.typography.headlineSmall)
+            TextButton(onClick = vm::refresh) { Text("Refresh") }
         }
-
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text("Sermons", style = MaterialTheme.typography.titleLarge)
-            TextButton(onClick = { vm.refresh() }, enabled = !state.isRefreshing) {
-                Text(if (state.isRefreshing) "Refreshing…" else "Refresh")
-            }
-        }
-
-        OutlinedTextField(
-            value = state.query,
-            onValueChange = vm::onQueryChange,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            singleLine = true,
-            label = { Text("Search") }
-        )
 
         Spacer(Modifier.height(12.dp))
 
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            items(state.items, key = { it.id }) { s ->
-                Card(onClick = { onSermonClick(s.id) }) {
-                    Column(Modifier.padding(16.dp)) {
-                        Text(s.title, style = MaterialTheme.typography.titleMedium)
-                        Spacer(Modifier.height(4.dp))
-                        Text(
-                            text = listOfNotNull(s.speaker, s.series).joinToString(" • "),
-                            style = MaterialTheme.typography.labelMedium
+        LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            items(sermons, key = { it.id }) { s ->
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { openYouTubeVideo(context, s.youtubeVideoId) }
+                ) {
+                    Row(Modifier.padding(12.dp), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        AsyncImage(
+                            model = s.thumbnailUrl,
+                            contentDescription = "YouTube thumbnail",
+                            modifier = Modifier.width(140.dp).height(80.dp)
                         )
-                        Spacer(Modifier.height(8.dp))
-                        Text(s.audioUrl, maxLines = 1, style = MaterialTheme.typography.bodySmall)
+
+                        Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                            Text(s.title, style = MaterialTheme.typography.titleMedium)
+                            val meta = listOfNotNull(s.speaker, s.series).joinToString(" • ")
+                            if (meta.isNotBlank()) Text(meta, style = MaterialTheme.typography.bodySmall)
+                            Text("Tap to open YouTube", style = MaterialTheme.typography.labelMedium)
+                        }
                     }
                 }
             }

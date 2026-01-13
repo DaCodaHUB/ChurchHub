@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "generatedAt": "2026-01-12T00:00:00Z",
+  "planTitle": "One Story That Leads To Jesus",
+  "items": [
+    {
+      "id": "2026-01-12",
+      "date": "2026-01-12",
+      "dayNumber": 12,
+      "reading": "Genesis 38–40",
+      "psalm": "Psalm 12"
+    },
+    {
+      "id": "2026-01-13",
+      "date": "2026-01-13",
+      "dayNumber": 13,
+      "reading": "Genesis 41–42",
+      "psalm": "Psalm 13"
+    }
+  ]
+}

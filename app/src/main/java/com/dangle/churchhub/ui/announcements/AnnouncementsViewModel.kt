@@ -2,41 +2,24 @@ package com.dangle.churchhub.ui.announcements
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.dangle.churchhub.domain.repo.AnnouncementRepository
+import com.dangle.churchhub.data.local.entity.AnnouncementEntity
+import com.dangle.churchhub.domain.repo.AnnouncementsRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class AnnouncementsViewModel @Inject constructor(
-    private val repo: AnnouncementRepository
+    private val repo: AnnouncementsRepository
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(AnnouncementsUiState())
-    val uiState: StateFlow<AnnouncementsUiState> = _uiState
-
-    init {
-        viewModelScope.launch {
-            repo.observeAnnouncements().collect { list ->
-                _uiState.update { it.copy(items = list) }
-            }
-        }
-        refresh()
-    }
+    val announcements: StateFlow<List<AnnouncementEntity>> =
+        repo.observeAll().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
 
     fun refresh() {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isRefreshing = true, error = null) }
-            val result = repo.syncAnnouncements()
-            _uiState.update {
-                it.copy(
-                    isRefreshing = false,
-                    error = result.exceptionOrNull()?.message
-                )
-            }
-        }
+        viewModelScope.launch { repo.refresh() }
     }
 }

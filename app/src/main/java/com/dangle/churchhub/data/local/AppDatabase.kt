@@ -2,25 +2,24 @@ package com.dangle.churchhub.data.local
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import com.dangle.churchhub.data.local.dao.AnnouncementDao
-import com.dangle.churchhub.data.local.dao.SermonDao
-import com.dangle.churchhub.data.local.dao.SermonDownloadDao
-import com.dangle.churchhub.data.local.entity.AnnouncementEntity
-import com.dangle.churchhub.data.local.entity.SermonDownloadEntity
-import com.dangle.churchhub.data.local.entity.SermonEntity
+import com.dangle.churchhub.data.local.dao.*
+import com.dangle.churchhub.data.local.entity.*
 
 @Database(
     entities = [
+        ChurchInfoEntity::class,
         AnnouncementEntity::class,
-        SermonEntity::class,
-        SermonDownloadEntity::class
+        ReadingPlanItemEntity::class,
+        ReadingPlanCompletedEntity::class,
+        YouTubeSermonEntity::class
     ],
-    version = 2,
+    version = 1,
     exportSchema = true
 )
 abstract class AppDatabase : RoomDatabase() {
+    abstract fun churchInfoDao(): ChurchInfoDao
     abstract fun announcementDao(): AnnouncementDao
-    abstract fun sermonDao(): SermonDao
-    abstract fun sermonDownloadDao(): SermonDownloadDao
+    abstract fun readingPlanDao(): ReadingPlanDao
+    abstract fun readingPlanCompletionDao(): ReadingPlanCompletionDao
+    abstract fun youTubeSermonDao(): YouTubeSermonDao
 }
-

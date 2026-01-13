@@ -47,10 +47,6 @@ android {
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.2")
 
-    // Media3
-    implementation("androidx.media3:media3-exoplayer:1.3.1")
-    implementation("androidx.media3:media3-common:1.3.1")
-
     // Navigation
     implementation("androidx.navigation:navigation-compose:2.8.5")
 
@@ -81,4 +77,6 @@ dependencies {
     implementation("androidx.compose.material3:material3")
 
     debugImplementation("androidx.compose.ui:ui-tooling")
+
+    implementation("io.coil-kt:coil-compose:2.6.0")
 }

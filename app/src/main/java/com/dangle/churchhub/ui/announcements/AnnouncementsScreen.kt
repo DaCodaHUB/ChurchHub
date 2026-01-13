@@ -13,42 +13,30 @@ import androidx.hilt.navigation.compose.hiltViewModel
 fun AnnouncementsScreen(
     vm: AnnouncementsViewModel = hiltViewModel()
 ) {
-    val state by vm.uiState.collectAsState()
+    val items = vm.announcements.collectAsState().value
 
-    Column(Modifier.fillMaxSize()) {
+    LaunchedEffect(Unit) { vm.refresh() }
 
-        if (state.error != null) {
-            Text(
-                text = "Sync failed: ${state.error}",
-                modifier = Modifier.padding(16.dp),
-                color = MaterialTheme.colorScheme.error
-            )
+    Column(Modifier.fillMaxSize().padding(16.dp)) {
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            Text("Announcements", style = MaterialTheme.typography.headlineSmall)
+            TextButton(onClick = vm::refresh) { Text("Refresh") }
         }
 
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text("Announcements", style = MaterialTheme.typography.titleLarge)
+        Spacer(Modifier.height(12.dp))
 
-            TextButton(onClick = { vm.refresh() }, enabled = !state.isRefreshing) {
-                Text(if (state.isRefreshing) "Refreshing…" else "Refresh")
-            }
-        }
-
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            items(state.items, key = { it.id }) { a ->
-                Card {
-                    Column(Modifier.padding(16.dp)) {
-                        Text(a.title, style = MaterialTheme.typography.titleMedium)
-                        Spacer(Modifier.height(4.dp))
+        LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            items(items, key = { it.id }) { a ->
+                Card(Modifier.fillMaxWidth()) {
+                    Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                            Text(a.title, style = MaterialTheme.typography.titleMedium)
+                            if (a.pinned) {
+                                Text("PINNED", style = MaterialTheme.typography.labelSmall)
+                            }
+                        }
                         Text(a.category, style = MaterialTheme.typography.labelMedium)
-                        Spacer(Modifier.height(8.dp))
-                        Text(a.bodyMarkdown, maxLines = 3)
+                        Text(a.bodyMarkdown, maxLines = 4, style = MaterialTheme.typography.bodyMedium)
                     }
                 }
             }

@@ -1,7 +1,6 @@
 package com.dangle.churchhub.core.di
 
-import com.dangle.churchhub.data.remote.api.SermonsApi
-import com.dangle.churchhub.data.remote.api.AnnouncementsApi
+import com.dangle.churchhub.data.remote.api.*
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
 import dagger.Provides
@@ -38,12 +37,15 @@ object NetworkModule {
             .build()
     }
 
-    @Provides @Singleton
-    fun provideAnnouncementsApi(retrofit: Retrofit): AnnouncementsApi =
+    @Provides @Singleton fun provideChurchInfoApi(retrofit: Retrofit): ChurchInfoApi =
+        retrofit.create(ChurchInfoApi::class.java)
+
+    @Provides @Singleton fun provideAnnouncementsApi(retrofit: Retrofit): AnnouncementsApi =
         retrofit.create(AnnouncementsApi::class.java)
 
-    @Provides @Singleton
-    fun provideSermonsApi(retrofit: Retrofit): SermonsApi =
-        retrofit.create(SermonsApi::class.java)
+    @Provides @Singleton fun provideReadingPlanApi(retrofit: Retrofit): ReadingPlanApi =
+        retrofit.create(ReadingPlanApi::class.java)
 
+    @Provides @Singleton fun provideSermonsYouTubeApi(retrofit: Retrofit): SermonsYouTubeApi =
+        retrofit.create(SermonsYouTubeApi::class.java)
 }

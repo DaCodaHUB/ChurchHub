@@ -1,9 +1,9 @@
-package com.dangle.churchhub.ui.sermons
+package com.dangle.churchhub.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.dangle.churchhub.data.local.entity.YouTubeSermonEntity
-import com.dangle.churchhub.domain.repo.SermonsRepository
+import com.dangle.churchhub.data.local.entity.ChurchInfoEntity
+import com.dangle.churchhub.domain.repo.ChurchInfoRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -12,12 +12,12 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class SermonsViewModel @Inject constructor(
-    private val repo: SermonsRepository
+class HomeViewModel @Inject constructor(
+    private val repo: ChurchInfoRepository
 ) : ViewModel() {
 
-    val sermons: StateFlow<List<YouTubeSermonEntity>> =
-        repo.observeSermons().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+    val churchInfo: StateFlow<ChurchInfoEntity?> =
+        repo.observe().stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), null)
 
     fun refresh() {
         viewModelScope.launch { repo.refresh() }

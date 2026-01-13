@@ -3,9 +3,7 @@ package com.dangle.churchhub.core.di
 import android.content.Context
 import androidx.room.Room
 import com.dangle.churchhub.data.local.AppDatabase
-import com.dangle.churchhub.data.local.dao.AnnouncementDao
-import com.dangle.churchhub.data.local.dao.SermonDao
-import com.dangle.churchhub.data.local.dao.SermonDownloadDao
+import com.dangle.churchhub.data.local.dao.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -23,12 +21,9 @@ object DatabaseModule {
             .fallbackToDestructiveMigration()
             .build()
 
-    @Provides
-    fun provideAnnouncementDao(db: AppDatabase): AnnouncementDao = db.announcementDao()
-
-    @Provides
-    fun provideSermonDao(db: AppDatabase): SermonDao = db.sermonDao()
-
-    @Provides
-    fun provideSermonDownloadDao(db: AppDatabase): SermonDownloadDao = db.sermonDownloadDao()
+    @Provides fun provideChurchInfoDao(db: AppDatabase): ChurchInfoDao = db.churchInfoDao()
+    @Provides fun provideAnnouncementDao(db: AppDatabase): AnnouncementDao = db.announcementDao()
+    @Provides fun provideReadingPlanDao(db: AppDatabase): ReadingPlanDao = db.readingPlanDao()
+    @Provides fun provideReadingPlanCompletionDao(db: AppDatabase): ReadingPlanCompletionDao = db.readingPlanCompletionDao()
+    @Provides fun provideYouTubeSermonDao(db: AppDatabase): YouTubeSermonDao = db.youTubeSermonDao()
 }
