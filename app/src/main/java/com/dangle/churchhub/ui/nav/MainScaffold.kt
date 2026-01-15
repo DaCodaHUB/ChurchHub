@@ -10,8 +10,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavType
 import androidx.navigation.compose.*
+import androidx.navigation.navArgument
 import com.dangle.churchhub.ui.announcements.AnnouncementsScreen
+import com.dangle.churchhub.ui.announcements.detail.AnnouncementDetailScreen
 import com.dangle.churchhub.ui.home.HomeScreen
 import com.dangle.churchhub.ui.readingplan.ReadingPlanScreen
 import com.dangle.churchhub.ui.sermons.SermonsScreen
@@ -65,9 +68,25 @@ fun MainScaffold() {
             startDestination = Route.Home.path
         ) {
             composable(Route.Home.path) { HomeScreen() }
-            composable(Route.Announcements.path) { AnnouncementsScreen() }
+            composable(Route.Announcements.path) {
+                AnnouncementsScreen(
+                    onOpenAnnouncement = { id ->
+                        navController.navigate("announcements/$id")
+                    }
+                )
+            }
             composable(Route.ReadingPlan.path) { ReadingPlanScreen() }
             composable(Route.Sermons.path) { SermonsScreen() }
+            composable(
+                route = "announcements/{id}",
+                arguments = listOf(navArgument("id") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val id = backStackEntry.arguments?.getString("id")!!
+                AnnouncementDetailScreen(
+                    announcementId = id,
+                    onBack = { navController.popBackStack() }
+                )
+            }
         }
     }
 }

@@ -28,12 +28,17 @@ class ReadingPlanRepositoryImpl @Inject constructor(
 
         val entities = dto.items.map { i ->
             ReadingPlanItemEntity(
-                id = i.id,
+                id = i.date, // stable + unique
                 dateEpochMs = parseLocalDateToEpochMs(i.date),
                 dayNumber = i.dayNumber,
+                displayDate = i.displayDate,
+                displayDateVi = i.displayDateVi,
                 reading = i.reading,
-                psalm = i.psalm,
+                readingVi = i.readingVi,
+                psalm = i.reading1,
+                psalmVi = i.reading1Vi,
                 planTitle = dto.planTitle,
+                planTitleVi = dto.planTitleVi,
                 updatedAtEpochMs = now
             )
         }

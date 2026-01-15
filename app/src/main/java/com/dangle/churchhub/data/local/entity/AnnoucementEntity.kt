@@ -7,9 +7,17 @@ import androidx.room.PrimaryKey
 data class AnnouncementEntity(
     @PrimaryKey val id: String,
     val title: String,
-    val bodyMarkdown: String,
     val category: String,
     val pinned: Boolean,
     val publishedAtEpochMs: Long,
-    val updatedAtEpochMs: Long
+    val updatedAtEpochMs: Long,
+
+    // simple type
+    val bodyMarkdown: String? = null,
+
+    // bulletin type
+    val format: String? = null,
+    val bulletinJson: String? = null,
+
+    val titleEn: String? = null
 )

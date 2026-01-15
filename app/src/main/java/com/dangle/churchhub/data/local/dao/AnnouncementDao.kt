@@ -11,6 +11,9 @@ interface AnnouncementDao {
     @Query("SELECT * FROM announcements ORDER BY pinned DESC, publishedAtEpochMs DESC")
     fun observeAll(): Flow<List<AnnouncementEntity>>
 
+    @Query("SELECT * FROM announcements WHERE id = :id LIMIT 1")
+    fun observeById(id: String): Flow<AnnouncementEntity?>
+
     @Upsert
     suspend fun upsertAll(items: List<AnnouncementEntity>)
 
