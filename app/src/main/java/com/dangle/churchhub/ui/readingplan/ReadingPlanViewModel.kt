@@ -3,15 +3,16 @@ package com.dangle.churchhub.ui.readingplan
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.dangle.churchhub.data.local.entity.ReadingPlanItemEntity
+import com.dangle.churchhub.data.settings.SettingsRepository
 import com.dangle.churchhub.domain.repo.ReadingPlanRepository
+import com.dangle.churchhub.ui.settings.AppLanguage
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -21,7 +22,7 @@ data class ReadingPlanRow(
 )
 
 data class ReadingPlanUiState(
-    val language: Language = Language.EN,
+    val language: AppLanguage = AppLanguage.EN,
     val isRefreshing: Boolean = false,
     val error: String? = null,
     val planTitle: String = "",
@@ -31,40 +32,37 @@ data class ReadingPlanUiState(
 
 @HiltViewModel
 class ReadingPlanViewModel @Inject constructor(
-    private val repo: ReadingPlanRepository
+    private val repo: ReadingPlanRepository,
+    settingsRepo: SettingsRepository
 ) : ViewModel() {
 
-    // Language toggle lives in the VM so it’s easy to reuse across screens later.
-    private val language = MutableStateFlow(Language.EN)
-
-    // Refresh/error state
-    private val refreshing = MutableStateFlow(false)
-    private val error = MutableStateFlow<String?>(null)
-
-    // Data streams from Room
     private val planFlow = repo.observePlan()
     private val completedIdsFlow = repo.observeCompletedIds()
 
-    // Combine plan + completion into rows
-    private val rowsFlow = combine(planFlow, completedIdsFlow) { plan, completedIds ->
-        plan.map { item -> ReadingPlanRow(item = item, isCompleted = completedIds.contains(item.id)) }
+    private val rowsFlow = combine(planFlow, completedIdsFlow) { plan, done ->
+        plan.map { ReadingPlanRow(it, done.contains(it.id)) }
     }.distinctUntilChanged()
 
-    // Derive titles from the first item (since each entity stores plan titles)
-    private val titlesFlow = planFlow.mapTitles()
+    private val titlesFlow = planFlow
+        .map { plan ->
+            val first = plan.firstOrNull()
+            (first?.planTitle.orEmpty()) to (first?.planTitleVi.orEmpty())
+        }
+        .distinctUntilChanged()
 
-    // Public UI state
+    private val languageFlow = settingsRepo.settings
+        .map { it.language }
+        .distinctUntilChanged()
+
+    // Refresh/error states kept simple
+    private val refreshState = kotlinx.coroutines.flow.MutableStateFlow(false)
+    private val errorState = kotlinx.coroutines.flow.MutableStateFlow<String?>(null)
+
     val uiState: StateFlow<ReadingPlanUiState> =
-        combine(
-            language,
-            refreshing,
-            error,
-            titlesFlow,
-            rowsFlow
-        ) { lang, isRefreshing, err, titles, rows ->
+        combine(languageFlow, refreshState, errorState, titlesFlow, rowsFlow) { lang, refreshing, err, titles, rows ->
             ReadingPlanUiState(
                 language = lang,
-                isRefreshing = isRefreshing,
+                isRefreshing = refreshing,
                 error = err,
                 planTitle = titles.first,
                 planTitleVi = titles.second,
@@ -72,41 +70,21 @@ class ReadingPlanViewModel @Inject constructor(
             )
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ReadingPlanUiState())
 
-    fun setLanguage(lang: Language) {
-        language.value = lang
-    }
-
-    fun toggleLanguage() {
-        language.value = if (language.value == Language.EN) Language.VI else Language.EN
+    init {
+        refresh()
     }
 
     fun refresh() {
         viewModelScope.launch {
-            refreshing.value = true
-            error.value = null
-
+            refreshState.value = true
+            errorState.value = null
             val result = repo.refresh()
-            refreshing.value = false
-            error.value = result.exceptionOrNull()?.message
+            refreshState.value = false
+            errorState.value = result.exceptionOrNull()?.message
         }
     }
 
     fun setCompleted(itemId: String, completed: Boolean) {
-        viewModelScope.launch {
-            repo.setCompleted(itemId, completed)
-        }
+        viewModelScope.launch { repo.setCompleted(itemId, completed) }
     }
 }
-
-/**
- * Helper to derive (planTitle, planTitleVi) from the plan list.
- * Assumes your entity stores both titles (from reading_plan.json). :contentReference[oaicite:1]{index=1}
- */
-private fun kotlinx.coroutines.flow.Flow<List<ReadingPlanItemEntity>>.mapTitles():
-        kotlinx.coroutines.flow.Flow<Pair<String, String>> =
-    this.combine(MutableStateFlow(Unit)) { plan, _ ->
-        val first = plan.firstOrNull()
-        val en = first?.planTitle.orEmpty()
-        val vi = first?.planTitleVi.orEmpty()
-        en to vi
-    }.distinctUntilChanged()

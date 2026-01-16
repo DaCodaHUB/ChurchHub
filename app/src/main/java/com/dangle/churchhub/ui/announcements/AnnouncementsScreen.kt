@@ -1,40 +1,31 @@
 package com.dangle.churchhub.ui.announcements
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Card
-import androidx.compose.material3.FilterChip
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.dangle.churchhub.data.local.entity.AnnouncementEntity
+import com.dangle.churchhub.ui.settings.AppLanguage
+import com.dangle.churchhub.ui.settings.SettingsViewModel
 
 @Composable
 fun AnnouncementsScreen(
     onOpenAnnouncement: (String) -> Unit,
-    vm: AnnouncementsViewModel = hiltViewModel()
+    vm: AnnouncementsViewModel = hiltViewModel(),
+    settingsVm: SettingsViewModel = hiltViewModel()
 ) {
     val state by vm.uiState.collectAsState()
+    val settings by settingsVm.settings.collectAsState()
+    val lang = settings.language
 
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        // Header
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             Text("Announcements", style = MaterialTheme.typography.headlineSmall)
             TextButton(onClick = vm::refresh, enabled = !state.isRefreshing) {
@@ -42,7 +33,6 @@ fun AnnouncementsScreen(
             }
         }
 
-        // Error banner
         state.error?.let { msg ->
             Text(
                 text = "Error: $msg",
@@ -51,7 +41,6 @@ fun AnnouncementsScreen(
             )
         }
 
-        // Category chips (optional)
         AnnouncementsCategoryChips(
             categories = state.categories,
             selectedCategory = state.selectedCategory,
@@ -60,7 +49,6 @@ fun AnnouncementsScreen(
 
         Spacer(Modifier.height(4.dp))
 
-        // List
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -68,6 +56,7 @@ fun AnnouncementsScreen(
             items(state.items, key = { it.id }) { a ->
                 AnnouncementCard(
                     a = a,
+                    language = lang,
                     onClick = { onOpenAnnouncement(a.id) }
                 )
             }
@@ -100,8 +89,13 @@ private fun AnnouncementsCategoryChips(
 @Composable
 private fun AnnouncementCard(
     a: AnnouncementEntity,
+    language: AppLanguage,
     onClick: () -> Unit
 ) {
+    val displayTitle =
+        if (language == AppLanguage.EN && !a.titleEn.isNullOrBlank()) a.titleEn!!
+        else a.title
+
     Card(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth()
@@ -110,19 +104,12 @@ private fun AnnouncementCard(
             modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(6.dp)
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(a.title, style = MaterialTheme.typography.titleMedium)
+            Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                Text(displayTitle, style = MaterialTheme.typography.titleMedium)
 
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    if (a.pinned) {
-                        Text("PINNED", style = MaterialTheme.typography.labelSmall)
-                    }
-                    if (a.format == "bulletin") {
-                        Text("BULLETIN", style = MaterialTheme.typography.labelSmall)
-                    }
+                    if (a.pinned) Text("PINNED", style = MaterialTheme.typography.labelSmall)
+                    if (a.format == "bulletin") Text("BULLETIN", style = MaterialTheme.typography.labelSmall)
                 }
             }
 
@@ -133,10 +120,7 @@ private fun AnnouncementCard(
                 !a.bodyMarkdown.isNullOrBlank() -> a.bodyMarkdown!!
                 else -> ""
             }
-
-            if (preview.isNotBlank()) {
-                Text(preview, maxLines = 3, style = MaterialTheme.typography.bodyMedium)
-            }
+            if (preview.isNotBlank()) Text(preview, maxLines = 3, style = MaterialTheme.typography.bodyMedium)
         }
     }
 }

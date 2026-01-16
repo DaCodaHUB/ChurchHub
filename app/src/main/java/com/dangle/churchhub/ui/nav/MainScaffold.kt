@@ -5,6 +5,7 @@ import androidx.compose.material.icons.filled.Article
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.MenuBook
 import androidx.compose.material.icons.filled.PlayCircle
+import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -16,8 +17,10 @@ import androidx.navigation.navArgument
 import com.dangle.churchhub.ui.announcements.AnnouncementsScreen
 import com.dangle.churchhub.ui.announcements.detail.AnnouncementDetailScreen
 import com.dangle.churchhub.ui.home.HomeScreen
+import com.dangle.churchhub.ui.more.MoreScreen
 import com.dangle.churchhub.ui.readingplan.ReadingPlanScreen
 import com.dangle.churchhub.ui.sermons.SermonsScreen
+import com.dangle.churchhub.ui.settings.SettingsScreen
 
 private data class BottomItem(
     val route: Route,
@@ -32,8 +35,8 @@ fun MainScaffold() {
     val items = listOf(
         BottomItem(Route.Home, "Home", Icons.Filled.Home),
         BottomItem(Route.Announcements, "News", Icons.Filled.Article),
-        BottomItem(Route.ReadingPlan, "Plan", Icons.Filled.MenuBook),
         BottomItem(Route.Sermons, "Sermons", Icons.Filled.PlayCircle),
+        BottomItem(Route.More, "More", Icons.Filled.MoreHoriz),
     )
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -48,10 +51,7 @@ fun MainScaffold() {
                         selected = selected,
                         onClick = {
                             navController.navigate(item.route.path) {
-                                // avoids building a huge backstack when switching tabs
-                                popUpTo(navController.graph.findStartDestination().id) {
-                                    saveState = true
-                                }
+                                popUpTo(navController.graph.findStartDestination().id) { saveState = true }
                                 launchSingleTop = true
                                 restoreState = true
                             }
@@ -68,17 +68,18 @@ fun MainScaffold() {
             startDestination = Route.Home.path
         ) {
             composable(Route.Home.path) { HomeScreen() }
+
             composable(Route.Announcements.path) {
                 AnnouncementsScreen(
                     onOpenAnnouncement = { id ->
-                        navController.navigate("announcements/$id")
+                        navController.navigate(Route.AnnouncementDetail.create(id))
                     }
                 )
             }
-            composable(Route.ReadingPlan.path) { ReadingPlanScreen() }
-            composable(Route.Sermons.path) { SermonsScreen() }
+
+            // Detail route (required if you navigate to announcements/{id})
             composable(
-                route = "announcements/{id}",
+                route = Route.AnnouncementDetail.path,
                 arguments = listOf(navArgument("id") { type = NavType.StringType })
             ) { backStackEntry ->
                 val id = backStackEntry.arguments?.getString("id")!!
@@ -87,6 +88,18 @@ fun MainScaffold() {
                     onBack = { navController.popBackStack() }
                 )
             }
+
+            composable(Route.ReadingPlan.path) { ReadingPlanScreen() }
+            composable(Route.Sermons.path) { SermonsScreen() }
+
+            composable(Route.More.path) {
+                MoreScreen(
+                    onOpenSettings = { navController.navigate(Route.Settings.path) },
+                    onOpenReadingPlan = { navController.navigate(Route.ReadingPlan.path) }
+                )
+            }
+
+            composable(Route.Settings.path) { SettingsScreen() }
         }
     }
 }

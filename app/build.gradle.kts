@@ -50,6 +50,9 @@ dependencies {
     // Navigation
     implementation("androidx.navigation:navigation-compose:2.8.5")
 
+    // Datastore
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
+
     // Hilt
     implementation("com.google.dagger:hilt-android:2.52")
     ksp("com.google.dagger:hilt-compiler:2.52")

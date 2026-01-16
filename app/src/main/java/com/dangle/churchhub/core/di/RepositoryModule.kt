@@ -1,6 +1,8 @@
 package com.dangle.churchhub.core.di
 
 import com.dangle.churchhub.data.repository.*
+import com.dangle.churchhub.data.settings.SettingsRepository
+import com.dangle.churchhub.data.settings.SettingsRepositoryImpl
 import com.dangle.churchhub.domain.repo.*
 import dagger.Binds
 import dagger.Module
@@ -16,4 +18,5 @@ abstract class RepositoryModule {
     @Binds @Singleton abstract fun bindAnnouncementsRepository(impl: AnnouncementsRepositoryImpl): AnnouncementsRepository
     @Binds @Singleton abstract fun bindReadingPlanRepository(impl: ReadingPlanRepositoryImpl): ReadingPlanRepository
     @Binds @Singleton abstract fun bindSermonsRepository(impl: SermonsRepositoryImpl): SermonsRepository
+    @Binds @Singleton abstract fun bindSettingsRepository(impl: SettingsRepositoryImpl): SettingsRepository
 }
