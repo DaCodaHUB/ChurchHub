@@ -2,8 +2,12 @@ name: Android CI
 
 on:
   pull_request:
-  push:
     branches: [ "main" ]
+
+  push:
+    branches:
+      - "main"
+      - "debug"
 
 jobs:
   build:
@@ -32,8 +36,9 @@ jobs:
       - name: Make Gradle wrapper executable
         run: chmod +x ./gradlew
 
-      # Lint is optional; enable if you want it strict
+      # Lint
       - name: Lint
+        if: github.event_name == 'pull_request'
         run: ./gradlew lintDebug --stacktrace
 
       - name: Build Debug APK
