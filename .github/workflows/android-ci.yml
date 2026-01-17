@@ -36,13 +36,13 @@ jobs:
       - name: Make Gradle wrapper executable
         run: chmod +x ./gradlew
 
-      # Lint
+      - name: Build Debug APK
+        run: ./gradlew assembleDebug --stacktrace
+
+      # Lint (PR)
       - name: Lint
         if: github.event_name == 'pull_request'
         run: ./gradlew lintDebug --stacktrace
-
-      - name: Build Debug APK
-        run: ./gradlew assembleDebug --stacktrace
 
       - name: Upload Debug APK
         uses: actions/upload-artifact@v4
