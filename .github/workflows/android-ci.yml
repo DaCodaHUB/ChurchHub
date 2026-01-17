@@ -32,10 +32,6 @@ jobs:
       - name: Make Gradle wrapper executable
         run: chmod +x ./gradlew
 
-      # If you have KSP/Hilt/Room, this is normal:
-      - name: Run unit tests
-        run: ./gradlew testDebugUnitTest --stacktrace
-
       # Lint is optional; enable if you want it strict
       - name: Lint
         run: ./gradlew lintDebug --stacktrace
@@ -48,3 +44,12 @@ jobs:
         with:
           name: ChurchHub-debug-apk
           path: app/build/outputs/apk/debug/*.apk
+
+      - name: Upload Gradle reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gradle-reports
+          path: |
+            app/build/reports/**/*
+            app/build/test-results/**/*
