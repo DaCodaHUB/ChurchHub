@@ -13,7 +13,7 @@ import com.dangle.churchhub.data.local.entity.*
         ReadingPlanCompletedEntity::class,
         YouTubeSermonEntity::class
     ],
-    version = 2,
+    version = 3,
     exportSchema = true
 )
 abstract class AppDatabase : RoomDatabase() {

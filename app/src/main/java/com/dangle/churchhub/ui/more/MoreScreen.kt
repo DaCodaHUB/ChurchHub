@@ -9,11 +9,12 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun MoreScreen(
+    contentPadding: PaddingValues,
     onOpenSettings: () -> Unit,
     onOpenReadingPlan: () -> Unit
 ) {
     Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
+        modifier = Modifier.fillMaxSize().padding(contentPadding).padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Text("More", style = MaterialTheme.typography.headlineSmall)

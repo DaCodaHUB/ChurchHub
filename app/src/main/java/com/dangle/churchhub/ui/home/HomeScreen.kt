@@ -12,6 +12,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
 fun HomeScreen(
+    contentPadding: PaddingValues,
     vm: HomeViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
@@ -20,7 +21,7 @@ fun HomeScreen(
     LaunchedEffect(Unit) { vm.refresh() }
 
     Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
+        modifier = Modifier.fillMaxSize().padding(contentPadding).padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {

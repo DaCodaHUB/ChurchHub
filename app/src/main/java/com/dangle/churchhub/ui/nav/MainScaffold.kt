@@ -15,7 +15,6 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.*
 import androidx.navigation.navArgument
 import com.dangle.churchhub.ui.announcements.AnnouncementsScreen
-import com.dangle.churchhub.ui.announcements.detail.AnnouncementDetailScreen
 import com.dangle.churchhub.ui.home.HomeScreen
 import com.dangle.churchhub.ui.more.MoreScreen
 import com.dangle.churchhub.ui.readingplan.ReadingPlanScreen
@@ -46,14 +45,31 @@ fun MainScaffold() {
         bottomBar = {
             NavigationBar {
                 items.forEach { item ->
-                    val selected = currentRoute == item.route.path
+                    val selected = when (item.route) {
+                        Route.More -> currentRoute?.startsWith("more") == true
+                        else -> currentRoute == item.route.path
+                    }
+
                     NavigationBarItem(
                         selected = selected,
                         onClick = {
-                            navController.navigate(item.route.path) {
-                                popUpTo(navController.graph.findStartDestination().id) { saveState = true }
-                                launchSingleTop = true
-                                restoreState = true
+                            if (item.route == Route.More) {
+                                // If we're already somewhere under more/*, pop back to the More root screen.
+                                val popped = navController.popBackStack(Route.More.path, inclusive = false)
+                                if (!popped) {
+                                    // If More isn't on the back stack yet, just navigate to it.
+                                    navController.navigate(Route.More.path) {
+                                        popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                                        launchSingleTop = true
+                                        restoreState = true
+                                    }
+                                }
+                            } else {
+                                navController.navigate(item.route.path) {
+                                    popUpTo(navController.graph.findStartDestination().id) { saveState = true }
+                                    launchSingleTop = true
+                                    restoreState = true
+                                }
                             }
                         },
                         icon = { Icon(item.icon, contentDescription = item.label) },
@@ -67,39 +83,23 @@ fun MainScaffold() {
             navController = navController,
             startDestination = Route.Home.path
         ) {
-            composable(Route.Home.path) { HomeScreen() }
+            composable(Route.Home.path) { HomeScreen(contentPadding = padding) }
 
-            composable(Route.Announcements.path) {
-                AnnouncementsScreen(
-                    onOpenAnnouncement = { id ->
-                        navController.navigate(Route.AnnouncementDetail.create(id))
-                    }
-                )
-            }
+            composable(Route.Announcements.path) { AnnouncementsScreen(contentPadding = padding) }
 
-            // Detail route (required if you navigate to announcements/{id})
-            composable(
-                route = Route.AnnouncementDetail.path,
-                arguments = listOf(navArgument("id") { type = NavType.StringType })
-            ) { backStackEntry ->
-                val id = backStackEntry.arguments?.getString("id")!!
-                AnnouncementDetailScreen(
-                    announcementId = id,
-                    onBack = { navController.popBackStack() }
-                )
-            }
-
-            composable(Route.ReadingPlan.path) { ReadingPlanScreen() }
-            composable(Route.Sermons.path) { SermonsScreen() }
+            composable(Route.Sermons.path) { SermonsScreen(contentPadding = padding) }
 
             composable(Route.More.path) {
                 MoreScreen(
-                    onOpenSettings = { navController.navigate(Route.Settings.path) },
-                    onOpenReadingPlan = { navController.navigate(Route.ReadingPlan.path) }
+                    contentPadding = padding,
+                    onOpenSettings = { navController.navigate(Route.MoreSettings.path) },
+                    onOpenReadingPlan = { navController.navigate(Route.MoreReadingPlan.path) }
                 )
             }
 
-            composable(Route.Settings.path) { SettingsScreen() }
+            // Nested More routes
+            composable(Route.MoreSettings.path) { SettingsScreen(contentPadding = padding) }
+            composable(Route.MoreReadingPlan.path) { ReadingPlanScreen(contentPadding = padding) }
         }
     }
 }

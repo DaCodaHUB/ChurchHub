@@ -15,6 +15,7 @@ import com.dangle.churchhub.core.util.openYouTubeVideo
 
 @Composable
 fun SermonsScreen(
+    contentPadding: PaddingValues,
     vm: SermonsViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
@@ -22,7 +23,7 @@ fun SermonsScreen(
 
     LaunchedEffect(Unit) { vm.refresh() }
 
-    Column(Modifier.fillMaxSize().padding(16.dp)) {
+    Column(Modifier.fillMaxSize().padding(contentPadding).padding(16.dp)) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             Text("Sermons", style = MaterialTheme.typography.headlineSmall)
             TextButton(onClick = vm::refresh) { Text("Refresh") }

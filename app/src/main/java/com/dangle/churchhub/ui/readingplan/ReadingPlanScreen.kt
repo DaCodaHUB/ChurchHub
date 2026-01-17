@@ -2,6 +2,7 @@ package com.dangle.churchhub.ui.readingplan
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,12 +26,13 @@ import com.dangle.churchhub.ui.settings.AppLanguage
 
 @Composable
 fun ReadingPlanScreen(
+    contentPadding: PaddingValues,
     vm: ReadingPlanViewModel = hiltViewModel()
 ) {
     val state by vm.uiState.collectAsState()
 
     Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
+        modifier = Modifier.fillMaxSize().padding(contentPadding).padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {

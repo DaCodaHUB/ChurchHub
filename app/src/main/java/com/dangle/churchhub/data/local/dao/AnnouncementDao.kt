@@ -8,15 +8,10 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface AnnouncementDao {
-    @Query("SELECT * FROM announcements ORDER BY pinned DESC, publishedAtEpochMs DESC")
-    fun observeAll(): Flow<List<AnnouncementEntity>>
 
-    @Query("SELECT * FROM announcements WHERE id = :id LIMIT 1")
-    fun observeById(id: String): Flow<AnnouncementEntity?>
+    @Query("SELECT * FROM announcements_bulletin WHERE id = 1 LIMIT 1")
+    fun observe(): Flow<AnnouncementEntity?>
 
     @Upsert
-    suspend fun upsertAll(items: List<AnnouncementEntity>)
-
-    @Query("DELETE FROM announcements")
-    suspend fun clear()
+    suspend fun upsert(entity: AnnouncementEntity)
 }

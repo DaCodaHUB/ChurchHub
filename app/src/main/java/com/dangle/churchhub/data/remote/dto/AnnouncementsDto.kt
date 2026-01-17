@@ -1,63 +1,67 @@
 package com.dangle.churchhub.data.remote.dto
 
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class AnnouncementsResponseDto(
-    val version: Int? = null,
-    val generatedAt: String? = null,
-    val announcements: List<AnnouncementDto>
+data class AnnouncementsDto(
+    val version: Int = 1,
+    @SerialName("generated_at")
+    val generatedAt: String = "",
+    val announcements: List<AnnouncementSectionDto> = emptyList()
 )
 
 @Serializable
-data class AnnouncementDto(
-    val id: String,
-    val title: String,
-    val category: String,
-    val pinned: Boolean,
-    val publishedAt: String,
-    val updatedAt: String,
+data class AnnouncementSectionDto(
+    @SerialName("heading_en")
+    val headingEn: String = "",
 
-    // Simple announcement
-    val bodyMarkdown: String? = null,
+    @SerialName("heading_vi")
+    val headingVi: String = "",
 
-    // Bulletin-style announcement
-    val format: String? = null,          // "bulletin"
-    val bulletin: BulletinDto? = null,
-
-    // optional bilingual title in your sample
-    val title_en: String? = null
+    val items: List<AnnouncementItemDto> = emptyList()
 )
 
 @Serializable
-data class BulletinDto(
-    val sections: List<BulletinSectionDto>
+data class AnnouncementItemDto(
+    @SerialName("text_en")
+    val textEn: String = "",
+
+    @SerialName("text_vi")
+    val textVi: String = "",
+
+    @SerialName("details_en")
+    val detailsEn: String? = null,
+
+    @SerialName("details_vi")
+    val detailsVi: String? = null,
+
+    val meta: List<AnnouncementMetaDto>? = null,
+    val subitems: List<AnnouncementSubItemDto>? = null
 )
 
 @Serializable
-data class BulletinSectionDto(
-    val heading: String,
-    val headingEn: String? = null,
-    val items: List<BulletinItemDto>
+data class AnnouncementMetaDto(
+    @SerialName("label_en")
+    val labelEn: String = "",
+
+    @SerialName("label_vi")
+    val labelVi: String = "",
+
+    val value: String = ""
 )
 
 @Serializable
-data class BulletinItemDto(
-    val text: String,
-    val details: String? = null,
-    val subitems: List<BulletinSubItemDto>? = null,
-    val meta: List<BulletinMetaDto>? = null
-)
+data class AnnouncementSubItemDto(
+    @SerialName("label_en")
+    val labelEn: String = "",
 
-@Serializable
-data class BulletinSubItemDto(
-    val label: String,
-    val text: String,
-    val meta: List<BulletinMetaDto>? = null
-)
+    @SerialName("label_vi")
+    val labelVi: String = "",
 
-@Serializable
-data class BulletinMetaDto(
-    val label: String,
-    val value: String
+    @SerialName("text_en")
+    val textEn: String = "",
+
+    @SerialName("text_vi")
+    val textVi: String = ""
 )

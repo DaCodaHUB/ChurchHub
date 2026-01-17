@@ -9,12 +9,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
 fun SettingsScreen(
+    contentPadding: PaddingValues,
     vm: SettingsViewModel = hiltViewModel()
 ) {
     val settings by vm.settings.collectAsState()
 
     Column(
-        modifier = Modifier.fillMaxSize().padding(16.dp),
+        modifier = Modifier.fillMaxSize().padding(contentPadding).padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Text("Settings", style = MaterialTheme.typography.headlineSmall)
